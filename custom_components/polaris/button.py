@@ -292,8 +292,8 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
                 
                 # Get entity_id by unique_id
                 # Работает
-                zzzz = self.get_state_by_unique_id("number", "amount")
-                _LOGGER.debug("state %s", zzzz)
+#                zzzz = self.get_state_by_unique_id("number", "amount")
+#                _LOGGER.debug("state %s", zzzz)
                 
             else:
                 state_amount = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_amount").state
@@ -359,11 +359,14 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
             if self.entity_description.key == "button_stop":
                 mqtt.publish(self.hass, self.entity_description.mqttTopicCommand, "[]")
             else:
-                state_temp = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature").state
-                state_time = self.hass.states.get(f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time").state
+###                state_temp = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature").state
+                state_temp = self.get_state_by_unique_id("number", "set_temperature")
+###                state_time = self.hass.states.get(f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time").state
+                state_time = self.get_state_by_unique_id("time", "cooking_time")
                 state_time_obj = datetime.strptime(state_time, "%H:%M:%S")
                 state_time_seconds = state_time_obj.hour * 3600 + state_time_obj.minute * 60 + state_time_obj.second
-                state_mode = self.hass.states.get(f"select.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_select_mode_cooker").state
+###                state_mode = self.hass.states.get(f"select.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_select_mode_cooker").state
+                state_mode = self.get_state_by_unique_id("select", "select_mode_cooker")
 # multi mode command +
                 command_mode = self._select_options[state_mode]
                 cook_mode = json.loads(command_mode)[0]

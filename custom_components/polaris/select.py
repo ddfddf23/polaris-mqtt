@@ -18,6 +18,7 @@ from homeassistant.util import slugify
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers import entity_registry as er
 from .common import PolarisBaseEntity
 # Import global values.
 from .const import (
@@ -477,6 +478,12 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
         except StopIteration:
             return None
 
+    def get_entity_id_by_unique_id(self, entity_domain, entity_name):
+        entity_unique_id = f"{self.device_id}_{entity_name}"
+        entity_registry = er.async_get(self.hass)
+        entity_id = entity_registry.async_get_entity_id(entity_domain, "polaris", entity_unique_id)
+        return entity_id
+
     async def async_select_option(self, option: str) -> None:
         self._attr_current_option = option
         if POLARIS_DEVICE[int(self.device_type)]['class'] in ("cooker", "air_fryer"):
@@ -486,11 +493,13 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
                 cook_time = [cook_time]
                 
             service_data = {}
-            service_data["entity_id"] = f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time"
+        #    service_data["entity_id"] = f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time"
+            service_data["entity_id"] = self.get_entity_id_by_unique_id("time", "cooking_time")
             service_data["time"] = str(datetime.timedelta(seconds=cook_time[0]["time"]))
             await self.hass.services.async_call("time", "set_value", service_data)
             service_data = {}
-            service_data["entity_id"] = f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature"
+        #    service_data["entity_id"] = f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature"
+            service_data["entity_id"] = self.get_entity_id_by_unique_id("number", "set_temperature")
             service_data["value"] = cook_time[0]["temperature"]
             await self.hass.services.async_call("number", "set_value", service_data)
 #        if POLARIS_DEVICE[int(self.device_type)]['class'] == "air_fryer":

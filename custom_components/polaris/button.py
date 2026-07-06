@@ -231,8 +231,39 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
             else:
                 self._select_options = json.loads(json.dumps(AIRFRYER_1_MODES))
         if POLARIS_DEVICE[int(self.device_type)]['class'] == "coffeemaker":
-            if int(self.device_type) == 45:
-                self._select_options = json.loads(json.dumps(SELECT_COFFEEMAKER_ROG[0].options))
+            if self.device_type in POLARIS_COFFEEMAKER_ROG_TYPE:
+                if self.device_type in ("222","274","279"): #ROG_TYPE_3
+                    self._select_options = {
+                        'not_selected': '[{"mode": 0, "amount": 30, "tank": 0, "temperature": 95}]',
+                        'espresso': '[{"mode": 1, "amount": 65, "tank": 0, "temperature": 95}]',
+                        'doppio': '[{"mode": 7, "amount": 115, "tank": 0, "temperature": 95}]',
+                        'cappuccino': '[{"mode": 2, "amount": 50, "tank": 15, "temperature": 95}]',
+                        'double_cappuccino': '[{"mode": 8, "amount": 100, "tank": 25, "temperature": 95}]',
+                        'latte': '[{"mode": 3, "amount": 65, "tank": 32, "temperature": 95}]',
+                        'double_latte': '[{"mode": 9, "amount": 115, "tank": 40, "temperature": 95}]',
+                        'lungo': '[{"mode": 1, "amount": 120, "tank": 0, "temperature": 95}]',
+                        'flat_white': '[{"mode": 2, "amount": 70, "tank": 20, "temperature": 95}]',
+                        'clearing': '[{"mode": 4, "amount": 0, "tank": 0, "temperature": 95}]',
+                        'heating': '[{"mode": 5, "amount": 0, "tank": 0, "temperature": 95}]',
+                        'hot_milk': '[{"mode": 6, "amount": 0, "tank": 15, "temperature": 95}]'
+                    }
+                elif device_type in ("190","207","235"): #ROG_TYPE_2
+                     self._select_options = {
+                         'not_selected': '[{"mode": 0, "amount": 30, "tank": 0, "temperature": 95}]',
+                         'espresso': '[{"mode": 1, "amount": 65, "tank": 0, "temperature": 95}]',
+                         'doppio': '[{"mode": 2, "amount": 115, "tank": 0, "temperature": 95}]',
+                         'cappuccino': '[{"mode": 2, "amount": 50, "tank": 15, "temperature": 95}]',
+                         'double_cappuccino': '[{"mode": 2, "amount": 100, "tank": 25, "temperature": 95}]',
+                         'latte': '[{"mode": 3, "amount": 65, "tank": 32, "temperature": 95}]',
+                         'double_latte': '[{"mode": 2, "amount": 115, "tank": 40, "temperature": 95}]',
+                         'lungo': '[{"mode": 1, "amount": 120, "tank": 0, "temperature": 95}]',
+                         'flat_white': '[{"mode": 2, "amount": 70, "tank": 20, "temperature": 95}]',
+                         'clearing': '[{"mode": 4, "amount": 0, "tank": 0, "temperature": 95}]',
+                         'heating': '[{"mode": 5, "amount": 0, "tank": 0, "temperature": 95}]',
+                         'hot_milk': '[{"mode": 6, "amount": 0, "tank": 15, "temperature": 95}]'
+                     }
+                else:
+                    self._select_options = json.loads(json.dumps(SELECT_COFFEEMAKER_ROG[0].options))
             else:
                 self._select_options = json.loads(json.dumps(SELECT_COFFEEMAKER[0].options))
 
@@ -292,8 +323,8 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
                 
                 # Get entity_id by unique_id
                 # Работает
-#                zzzz = self.get_state_by_unique_id("number", "amount")
-#                _LOGGER.debug("state %s", zzzz)
+                zzzz = self.get_state_by_unique_id("number", "amount")
+                _LOGGER.debug("state %s", zzzz)
                 
             else:
                 state_amount = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_amount").state
@@ -330,7 +361,7 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
                 state_amount = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_amount").state
                 state_tank = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_tank").state
                 state_temp = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_temperature").state
-                state_mode = self.hass.states.get(f"select.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_select_mode_cofeemaker").state
+                state_mode = self.hass.states.get(f"select.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_select_mode_cofeemaker_rog").state
                 state_cappuccinator = self.hass.states.get(f"binary_sensor.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cappuccinator").state
                 state_power = self.hass.states.get(f"switch.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_power").state
                 if state_power == "off":
@@ -359,14 +390,11 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
             if self.entity_description.key == "button_stop":
                 mqtt.publish(self.hass, self.entity_description.mqttTopicCommand, "[]")
             else:
-###                state_temp = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature").state
-                state_temp = self.get_state_by_unique_id("number", "set_temperature")
-###                state_time = self.hass.states.get(f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time").state
-                state_time = self.get_state_by_unique_id("time", "cooking_time")
+                state_temp = self.hass.states.get(f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature").state
+                state_time = self.hass.states.get(f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time").state
                 state_time_obj = datetime.strptime(state_time, "%H:%M:%S")
                 state_time_seconds = state_time_obj.hour * 3600 + state_time_obj.minute * 60 + state_time_obj.second
-###                state_mode = self.hass.states.get(f"select.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_select_mode_cooker").state
-                state_mode = self.get_state_by_unique_id("select", "select_mode_cooker")
+                state_mode = self.hass.states.get(f"select.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_select_mode_cooker").state
 # multi mode command +
                 command_mode = self._select_options[state_mode]
                 cook_mode = json.loads(command_mode)[0]

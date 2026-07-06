@@ -211,7 +211,7 @@ class PolarisBinarySensor(PolarisBaseEntity, BinarySensorEntity, ConfigEntry):
     async def async_added_to_hass(self):
         @callback
         async def message_received_base(message):
-            if int(self.device_type) == 45 and self.entity_description.key == "cappuccinator":
+            if self.device_type in POLARIS_COFFEEMAKER_ROG_TYPE and self.entity_description.key == "cappuccinator":
                 if int(message.payload) == 255:
                     self._attr_is_on = False
                     service_data = {}

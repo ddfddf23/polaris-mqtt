@@ -18,7 +18,6 @@ from homeassistant.util import slugify
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers import entity_registry as er
 from .common import PolarisBaseEntity
 # Import global values.
 from .const import (
@@ -379,7 +378,36 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
             self._EAP_data0 = "0000"
         if device_type in ("813","815","860"):
             self._conditioner_data0 = "0000"
-
+        if device_type in ("190","207","235"): #ROG_TYPE_2
+            self.entity_description.options = {
+                'not_selected': '[{"mode": 0, "amount": 30, "tank": 0, "temperature": 95}]',
+                'espresso': '[{"mode": 1, "amount": 65, "tank": 0, "temperature": 95}]',
+                'doppio': '[{"mode": 2, "amount": 115, "tank": 0, "temperature": 95}]',
+                'cappuccino': '[{"mode": 2, "amount": 50, "tank": 15, "temperature": 95}]',
+                'double_cappuccino': '[{"mode": 2, "amount": 100, "tank": 25, "temperature": 95}]',
+                'latte': '[{"mode": 3, "amount": 65, "tank": 32, "temperature": 95}]',
+                'double_latte': '[{"mode": 2, "amount": 115, "tank": 40, "temperature": 95}]',
+                'lungo': '[{"mode": 1, "amount": 120, "tank": 0, "temperature": 95}]',
+                'flat_white': '[{"mode": 2, "amount": 70, "tank": 20, "temperature": 95}]',
+                'clearing': '[{"mode": 4, "amount": 0, "tank": 0, "temperature": 95}]',
+                'heating': '[{"mode": 5, "amount": 0, "tank": 0, "temperature": 95}]',
+                'hot_milk': '[{"mode": 6, "amount": 0, "tank": 15, "temperature": 95}]'
+            }
+        if device_type in ("222","274","279"): #ROG_TYPE_3
+            self.entity_description.options = {
+                'not_selected': '[{"mode": 0, "amount": 30, "tank": 0, "temperature": 95}]',
+                'espresso': '[{"mode": 1, "amount": 65, "tank": 0, "temperature": 95}]',
+                'doppio': '[{"mode": 7, "amount": 115, "tank": 0, "temperature": 95}]',
+                'cappuccino': '[{"mode": 2, "amount": 50, "tank": 15, "temperature": 95}]',
+                'double_cappuccino': '[{"mode": 8, "amount": 100, "tank": 25, "temperature": 95}]',
+                'latte': '[{"mode": 3, "amount": 65, "tank": 32, "temperature": 95}]',
+                'double_latte': '[{"mode": 9, "amount": 115, "tank": 40, "temperature": 95}]',
+                'lungo': '[{"mode": 1, "amount": 120, "tank": 0, "temperature": 95}]',
+                'flat_white': '[{"mode": 2, "amount": 70, "tank": 20, "temperature": 95}]',
+                'clearing': '[{"mode": 4, "amount": 0, "tank": 0, "temperature": 95}]',
+                'heating': '[{"mode": 5, "amount": 0, "tank": 0, "temperature": 95}]',
+                'hot_milk': '[{"mode": 6, "amount": 0, "tank": 15, "temperature": 95}]'
+            }
         if self._custom_data_select is not None:
             if POLARIS_DEVICE[int(self.device_type)]['class'] == "kettle" and "SELECT_KETTLE_options" in self._custom_data_select:
 #                self.entity_description.options = json.loads(json.dumps(self.entity_description.options))
@@ -397,7 +425,7 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
                     self.entity_description.options[key] = json.dumps([value])
 #                _LOGGER.debug("cooker %s", self.entity_description.options)
             if POLARIS_DEVICE[int(self.device_type)]['class'] == "coffeemaker":
-                if int(self.device_type) == 45 and "SELECT_COFFEEMAKER_ROG_options" in self._custom_data_select:
+                if self.device_type in POLARIS_COFFEEMAKER_ROG_TYPE and "SELECT_COFFEEMAKER_ROG_options" in self._custom_data_select:
 #                    self.entity_description.options = json.loads(json.dumps(self.entity_description.options))
                     for key, value in self._custom_data_select["SELECT_COFFEEMAKER_ROG_options"].items():
                         self.entity_description.options[key] = json.dumps([value])
@@ -478,12 +506,6 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
         except StopIteration:
             return None
 
-    def get_entity_id_by_unique_id(self, entity_domain, entity_name):
-        entity_unique_id = f"{self.device_id}_{entity_name}"
-        entity_registry = er.async_get(self.hass)
-        entity_id = entity_registry.async_get_entity_id(entity_domain, "polaris", entity_unique_id)
-        return entity_id
-
     async def async_select_option(self, option: str) -> None:
         self._attr_current_option = option
         if POLARIS_DEVICE[int(self.device_type)]['class'] in ("cooker", "air_fryer"):
@@ -493,13 +515,11 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
                 cook_time = [cook_time]
                 
             service_data = {}
-        #    service_data["entity_id"] = f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time"
-            service_data["entity_id"] = self.get_entity_id_by_unique_id("time", "cooking_time")
+            service_data["entity_id"] = f"time.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_cooking_time"
             service_data["time"] = str(datetime.timedelta(seconds=cook_time[0]["time"]))
             await self.hass.services.async_call("time", "set_value", service_data)
             service_data = {}
-        #    service_data["entity_id"] = f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature"
-            service_data["entity_id"] = self.get_entity_id_by_unique_id("number", "set_temperature")
+            service_data["entity_id"] = f"number.{POLARIS_DEVICE[int(self.device_type)]['class'].replace('-', '_').lower()}_{POLARIS_DEVICE[int(self.device_type)]['model'].replace('-', '_').lower()}_set_temperature"
             service_data["value"] = cook_time[0]["temperature"]
             await self.hass.services.async_call("number", "set_value", service_data)
 #        if POLARIS_DEVICE[int(self.device_type)]['class'] == "air_fryer":

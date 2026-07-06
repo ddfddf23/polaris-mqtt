@@ -791,8 +791,8 @@ class PolarisSwitch(PolarisBaseEntity, SwitchEntity):
         @callback
         def message_received(message):
             if POLARIS_DEVICE[int(self.device_type)]['class'] == "coffeemaker":
-                if int(self.device_type) in POLARIS_COFFEEMAKER_ROG_TYPE:
-                    if str(message.payload) in ("1", "2", "3", "4", "5", "6"):
+                if self.device_type in POLARIS_COFFEEMAKER_ROG_TYPE:
+                    if str(message.payload) in ("1", "2", "3", "4", "5", "6", "true"):
                         self._attr_is_on = True
                     else:
                         self._attr_is_on = False

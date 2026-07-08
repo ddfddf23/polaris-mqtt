@@ -51,7 +51,6 @@ from .const import (
     POLARIS_COOKER_WITH_LID_TYPE,
     POLARIS_COFFEEMAKER_TYPE,
     POLARIS_COFFEEMAKER_ROG_TYPE,
-    POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE,
     POLARIS_CLIMATE_TYPE,
     POLARIS_AIRCLEANER_TYPE,
     POLARIS_AIRCLEANER_EAP_TYPE,
@@ -244,13 +243,6 @@ class PolarisBinarySensor(PolarisBaseEntity, BinarySensorEntity, ConfigEntry):
             message_received_base,
             1,
         )
-        if self.entity_description.key == "cappuccinator" and self.device_type in POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE:
-            await mqtt.async_subscribe(
-                self.hass,
-                self.entity_description.mqttTopicStatus.replace("/tank", "/water_tank"),
-                message_received_base,
-                1,
-            )
 
 
         @callback

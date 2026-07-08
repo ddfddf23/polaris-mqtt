@@ -43,7 +43,6 @@ from .const import (
     POLARIS_COOKER_TYPE,
     POLARIS_COFFEEMAKER_TYPE,
     POLARIS_COFFEEMAKER_ROG_TYPE,
-    POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE,
     POLARIS_AIRCLEANER_TYPE,
     POLARIS_IRRIGATOR_TYPE,
     POLARIS_HEATER_TYPE,
@@ -302,8 +301,6 @@ class PolarisNumber(PolarisBaseEntity, NumberEntity):
         else:
             self._attr_native_value = int(value)
             mqtt.publish(self.hass, self.entity_description.mqttTopicCommand, int(value))
-            if self.entity_description.key == "tank" and self.device_type in POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE:
-                mqtt.publish(self.hass, self.entity_description.mqttTopicCommand.replace("/tank", "/water_tank"), int(value))
             
     @property
     def get_state (self) -> int | None:
@@ -338,13 +335,6 @@ class PolarisNumber(PolarisBaseEntity, NumberEntity):
             message_received_numb,
             1,
         )
-        if self.entity_description.key == "tank" and self.device_type in POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE:
-            await mqtt.async_subscribe(
-                self.hass,
-                self.entity_description.mqttTopicCurrent.replace("/tank", "/water_tank"),
-                message_received_numb,
-                1,
-            )
         @callback
         async def entity_availability(message):
             if self.entity_description.name != "available":

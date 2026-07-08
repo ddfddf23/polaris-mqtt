@@ -48,7 +48,6 @@ from .const import (
     POLARIS_COOKER_TYPE,
     POLARIS_COFFEEMAKER_TYPE,
     POLARIS_COFFEEMAKER_ROG_TYPE,
-    POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE,
     POLARIS_CLIMATE_TYPE,
     POLARIS_AIRCLEANER_TYPE,
     AIRFRYER_1_MODES,
@@ -381,8 +380,6 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"amount", state_amount)
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"temperature", state_temp)
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"tank", state_tank)
-                    if self.device_type in POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE:
-                        mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"water_tank", state_tank)
                     command_mode = self._select_options[state_mode]
                     coffee_mode = json.loads(command_mode)
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"mode", coffee_mode[0]["mode"])

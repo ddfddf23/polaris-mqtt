@@ -401,7 +401,7 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
                 'cappuccino': '[{"mode": 2, "amount": 50, "tank": 15, "temperature": 95}]',
                 'double_cappuccino': '[{"mode": 8, "amount": 100, "tank": 25, "temperature": 95}]',
                 'latte': '[{"mode": 3, "amount": 65, "tank": 32, "temperature": 95}]',
-                'double_latte': '[{"mode": 9, "amount": 115, "tank": 40, "temperature": 95}]',
+                'double_latte': '[{"mode": 9, "amount": 115, "tank": 42, "temperature": 95}]',
                 'lungo': '[{"mode": 1, "amount": 120, "tank": 0, "temperature": 95}]',
                 'flat_white': '[{"mode": 2, "amount": 70, "tank": 20, "temperature": 95}]',
                 'clearing': '[{"mode": 4, "amount": 0, "tank": 0, "temperature": 95}]',
@@ -711,4 +711,3 @@ class PolarisSelect(PolarisBaseEntity, SelectEntity):
                 self.async_write_ha_state()
             
         await mqtt.async_subscribe(self.hass, f"{self.mqtt_root}/{self.entity_description.device_prefix_topic}/state/error/connection", entity_availability, 1)
-

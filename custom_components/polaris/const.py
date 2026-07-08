@@ -440,6 +440,7 @@ POLARIS_COOKER_TYPE = ["1","9","10","39","40","41","47","48","55","77","78","79"
 POLARIS_COOKER_WITH_LID_TYPE = ["9","39","40","41","47","48","55","77","78","79","80","89","95","114","138","162","169","183","192","206","210","215","240","266","267","268","270","301","302","303","290","291","292"]
 POLARIS_COFFEEMAKER_TYPE = ["103", "166", "200","261","265","276","277","278","280","305"]
 POLARIS_COFFEEMAKER_ROG_TYPE = ["45", "190", "207", "222", "235", "247", "274", "279"] 
+POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE = ["45", "222", "274", "279"]
 POLARIS_CLIMATE_TYPE = ["69", "869", "859"]
 POLARIS_AIRCLEANER_TYPE = ["140", "151", "152", "172", "203", "204", "236", "238", "239", "250", "251"]
 POLARIS_AIRCLEANER_EAP_TYPE = ["826"]
@@ -3468,7 +3469,7 @@ NUMBERS_COFFEEMAKER_ROG = [
         device_class=NumberDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.SECONDS,
         entity_registry_enabled_default=True,
-        native_max_value=40,
+        native_max_value=42,
         native_min_value=1,
         native_step=1,
         native_value=15,
@@ -3768,7 +3769,7 @@ SELECT_COFFEEMAKER_ROG = [
             "cappuccino": "[{\"mode\": 2, \"amount\": 50, \"tank\": 15, \"temperature\": 95}]",
             "double_cappuccino": "[{\"mode\": 2, \"amount\": 100, \"tank\": 25, \"temperature\": 95}]",
             "latte": "[{\"mode\": 3, \"amount\": 65, \"tank\": 32, \"temperature\": 95}]",
-            "double_latte": "[{\"mode\": 3, \"amount\": 115, \"tank\": 40, \"temperature\": 95}]",
+            "double_latte": "[{\"mode\": 3, \"amount\": 115, \"tank\": 42, \"temperature\": 95}]",
             "lungo": "[{\"mode\": 1, \"amount\": 120, \"tank\": 0, \"temperature\": 95}]",
             "flat_white": "[{\"mode\": 2, \"amount\": 70, \"tank\": 20, \"temperature\": 95}]",
             "clearing": "[{\"mode\": 4, \"amount\": 0, \"tank\": 0, \"temperature\": 95}]",

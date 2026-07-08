@@ -48,6 +48,7 @@ from .const import (
     POLARIS_COOKER_TYPE,
     POLARIS_COFFEEMAKER_TYPE,
     POLARIS_COFFEEMAKER_ROG_TYPE,
+    POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE,
     POLARIS_CLIMATE_TYPE,
     POLARIS_AIRCLEANER_TYPE,
     AIRFRYER_1_MODES,
@@ -240,7 +241,7 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
                         'cappuccino': '[{"mode": 2, "amount": 50, "tank": 15, "temperature": 95}]',
                         'double_cappuccino': '[{"mode": 8, "amount": 100, "tank": 25, "temperature": 95}]',
                         'latte': '[{"mode": 3, "amount": 65, "tank": 32, "temperature": 95}]',
-                        'double_latte': '[{"mode": 9, "amount": 115, "tank": 40, "temperature": 95}]',
+                        'double_latte': '[{"mode": 9, "amount": 115, "tank": 42, "temperature": 95}]',
                         'lungo': '[{"mode": 1, "amount": 120, "tank": 0, "temperature": 95}]',
                         'flat_white': '[{"mode": 2, "amount": 70, "tank": 20, "temperature": 95}]',
                         'clearing': '[{"mode": 4, "amount": 0, "tank": 0, "temperature": 95}]',
@@ -279,7 +280,7 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
                     self._select_options[key] = json.dumps([value])
 #                _LOGGER.debug("cooker %s", self._select_options)
             if POLARIS_DEVICE[int(self.device_type)]['class'] == "coffeemaker":
-                if int(self.device_type) == 45 and "SELECT_COFFEEMAKER_ROG_options" in self._custom_data_select:
+                if self.device_type in POLARIS_COFFEEMAKER_ROG_TYPE and "SELECT_COFFEEMAKER_ROG_options" in self._custom_data_select:
 #                    self._select_options = json.loads(json.dumps(SELECT_COFFEEMAKER_ROG[0].options))
                     for key, value in self._custom_data_select["SELECT_COFFEEMAKER_ROG_options"].items():
                         self._select_options[key] = json.dumps([value])
@@ -380,6 +381,8 @@ class PolarisButton(PolarisBaseEntity, ButtonEntity):
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"amount", state_amount)
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"temperature", state_temp)
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"tank", state_tank)
+                    if self.device_type in POLARIS_COFFEEMAKER_ROG_WATER_TANK_TYPE:
+                        mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"water_tank", state_tank)
                     command_mode = self._select_options[state_mode]
                     coffee_mode = json.loads(command_mode)
                     mqtt.publish(self.hass, self.entity_description.mqttTopicCommand+"mode", coffee_mode[0]["mode"])
